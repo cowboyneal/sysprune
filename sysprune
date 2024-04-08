@@ -23,11 +23,11 @@ test -n "$1" && backup_dir="$1"
 test -z "$backup_dir" && backup_dir='/opt/backup'
 
 if [ ! -d "$backup_dir" ]; then
-    printf "%s does not exist! Exiting.\n" $backup_dir
+    printf "%s does not exist! Exiting.\n" "$backup_dir"
     exit
 fi
 
-printf "Backing up to %s...\n" $backup_dir
+printf "Backing up to %s...\n" "$backup_dir"
 
 sysclean=$(which sysclean) 
 if [ ! -x "$sysclean" ]; then
@@ -42,18 +42,18 @@ for a in $(sysclean); do
             ;;
     esac
 
-    ls -alhF $a
-    printf "Prune %s? (Y/n) " $a
+    ls -alhF "$a"
+    printf "Prune %s? (Y/n) " "$a"
     read yesno
 
     case "$yesno" in
         '' | Y* | y* )
-            printf "Backing up %s.\n" $a
+            printf "Backing up %s.\n" "$a"
             mkdir -p "$backup_dir"$(dirname "$a")
             mv -iv "$a" "$backup_dir""$a"
             ;;
         *)
-            printf "Skipping %s.\n" $a
+            printf "Skipping %s.\n" "$a"
             ;;
     esac
 done
