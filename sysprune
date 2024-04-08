@@ -1,0 +1,59 @@
+#!/bin/ksh
+#
+# for OpenBSD, post-upgrade, a time for reflection and renewal
+#
+
+me=$(basename $0)
+
+case "$1" in
+    -h | --help )
+        cat << HELP_MESSAGE
+Usage: $me [DIRECTORY]
+Prune old files and save backups to DIRECTORY. If no DIRECTORY is specified,
+$me will default to /opt/backup. The DIRECTORY must exist for $me
+to function.
+
+  -h, --help                print this message
+HELP_MESSAGE
+        exit
+        ;;
+esac
+
+test -n "$1" && backup_dir="$1"
+test -z "$backup_dir" && backup_dir='/opt/backup'
+
+if [ ! -d "$backup_dir" ]; then
+    printf "%s does not exist! Exiting.\n" $backup_dir
+    exit
+fi
+
+printf "Backing up to %s...\n" $backup_dir
+
+sysclean=$(which sysclean) 
+if [ ! -x "$sysclean" ]; then
+    echo "sysclean not found. Exiting."
+    exit
+fi
+
+for a in $(sysclean); do
+    case "$a" in
+        /opt )
+            continue
+            ;;
+    esac
+
+    ls -alhF $a
+    printf "Prune %s? (Y/n) " $a
+    read yesno
+
+    case "$yesno" in
+        '' | Y* | y* )
+            printf "Backing up %s.\n" $a
+            mkdir -p "$backup_dir"$(dirname "$a")
+            mv -iv "$a" "$backup_dir""$a"
+            ;;
+        *)
+            printf "Skipping %s.\n" $a
+            ;;
+    esac
+done
