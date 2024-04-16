@@ -10,8 +10,8 @@ case "$1" in
         cat << HELP_MESSAGE
 Usage: $me [DIRECTORY]
 Prune old files and save backups to DIRECTORY. If no DIRECTORY is specified,
-$me will default to /opt/backup. The DIRECTORY must exist for $me
-to function.
+$me will default to /opt/backup. DIRECTORY must exist for $me to
+function.
 
   -h, --help                print this message
 HELP_MESSAGE
