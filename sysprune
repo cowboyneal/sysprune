@@ -5,19 +5,28 @@
 
 me=$(basename $0)
 
-case "$1" in
-    -h | --help )
-        cat << HELP_MESSAGE
-Usage: $me [DIRECTORY]
+args=`getopt h $*`
+if [ $? -ne 0 ]; then
+    exec "$0" -h
+fi
+set -- $args
+
+while [ $# -ne 0 ]; do
+    case "$1" in
+        -h)
+            cat << HELP_MESSAGE
+Usage: $me [-h] [DIRECTORY]
 Prune old files and save backups to DIRECTORY. If no DIRECTORY is specified,
 $me will default to /opt/backup. DIRECTORY must exist for $me to
 function.
 
-  -h, --help                print this message
+  -h    print this message and exit
 HELP_MESSAGE
-        exit
-        ;;
-esac
+            exit;;
+        --)
+            shift; break;;
+    esac
+done
 
 test -n "$1" && backup_dir="$1"
 test -z "$backup_dir" && backup_dir='/opt/backup'
@@ -37,7 +46,7 @@ fi
 
 for a in $(sysclean); do
     case "$a" in
-        /opt )
+        /opt)
             continue
             ;;
     esac
@@ -47,7 +56,7 @@ for a in $(sysclean); do
     read yesno
 
     case "$yesno" in
-        '' | Y* | y* )
+        ''|Y*|y*)
             printf "Backing up %s.\n" "$a"
             mkdir -p "$backup_dir"$(dirname "$a")
             mv -iv "$a" "$backup_dir""$a"
